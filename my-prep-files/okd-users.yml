@@ -1,0 +1,10 @@
+- name: setting users in htpasswd
+  hosts: masters
+  become: yes
+  remote_user: sekayasin
+  
+  tasks:
+    - name: creating users in /etc/origin/master/htpasswd on masters
+      shell: htpasswd -b /etc/origin/master/htpasswd {{ item.name }} {{ item.password }}
+      loop:
+        - { name: 'sekayasin@gmail.com', password: 'sekayasin'}

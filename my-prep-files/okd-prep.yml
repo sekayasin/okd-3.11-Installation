@@ -1,0 +1,86 @@
+- name: Preparing Hosts for OKD Installation
+  hosts: all
+  become: yes
+  remote_user: sekayasin
+  
+  tasks:
+    - name: Put SELinux in permissive mode, logging actions that would be blocked.
+      selinux:
+        policy: targeted
+        state: enforcing
+
+    - name: Enable firewalld
+      systemd:
+        state: started
+        name: firewalld
+        enabled: true
+
+    - name: Disable iptables
+      systemd:
+        state: stopped
+        name: iptables
+        enabled: false
+
+    - name: enable ip fowarding
+      copy:
+        src: files/99-openshift.conf
+        dest: /etc/sysctl.d/99-openshift.conf
+
+    - name: enable ip fowarding again...
+      shell: sysctl -p
+
+    - name: Creating OKD repo file /etc/yum.repos.d/CentOS-Extras.repo
+      copy:
+        src: files/CentOS-Extras.repo
+        dest: /etc/yum.repos.d/CentOS-Extras.repo
+
+    - name: Creating OKD repo file /etc/yum.repos.d/CentOS-OpenShift-Origin311.repo
+      copy:
+        src: files/CentOS-OpenShift-Origin311.repo
+        dest: /etc/yum.repos.d/CentOS-OpenShift-Origin311.repo
+
+    - name: Creating OKD file /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-PaaS
+      copy:
+        src: files/RPM-GPG-KEY-CentOS-SIG-PaaS
+        dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-PaaS
+
+    - name: Creating OKD repo file /etc/yum.repos.d/CentOS-Extras.repo
+      shell: yum install http://mirror.centos.org/centos/7/os/x86_64/Packages/subscription-manager-rhsm-certificates-1.24.26-1.el7.centos.x86_64.rpm -y | true 
+    
+    - name: Install required yum packages
+      package: 
+        state: installed
+        name:
+         - git
+         - wget
+         - net-tools
+         - bind-utils
+         - yum-utils
+         - iptables-services
+         - bridge-utils
+         - bash-completion
+         - kexec-tools
+         - sos
+         - psacct
+         - pyOpenSSL
+         - vim
+         - tmux
+         - python3-pip
+         - containers-common
+         - fprintd-pam
+         - docker
+         - origin-docker-excluder
+         - java-1.8.0-openjdk-headless
+
+    - name: Create symlink /usr/libexec/docker/docker-runc
+      file:
+        src: /usr/libexec/docker/docker-runc-current
+        dest: /usr/libexec/docker/docker-runc
+        state: link
+
+    - name: Create symlink /usr/bin/docker-runc
+      file:
+        src: /usr/libexec/docker/docker-runc-current
+        dest: /usr/bin/docker-runc
+        state: link
+
