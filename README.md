@@ -102,11 +102,11 @@ $ cd openshift-ansible && git fetch && git checkout release-3.11 & cd ..
 NOTE: You can run the prerequisites.yml playbook if u want, our custom okd-prep.yml playbook gave us a go ahead.
 OPTIONAL RUN:
 
-$ ansible-playbook -i okd-3.11-Installation/my-prep-files  openshift-ansible/playbooks/prerequisites.yml
+$ ansible-playbook -i okd-3.11-Installation/my-prep-files/hosts  openshift-ansible/playbooks/prerequisites.yml
 
 Finally Run the cluster deploy playbook
 
-$ ansible-playbook -i okd-3.11-Installation/my-prep-files  openshift-ansible/playbooks/deploy_cluster.yml
+$ ansible-playbook -i okd-3.11-Installation/my-prep-files/hosts  openshift-ansible/playbooks/deploy_cluster.yml
 ```
 
 ### Troubleshooting Issues
